@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% set active_menu = 'Relatórios' %}
+
+{% block title %}Relatórios{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/fluxo.css') }}">
+{% endblock %}
+{% block crumbs %}<a href="#">Relatórios</a><span>/</span><strong>Relatório do período</strong>{% endblock %}
+
+{% block content %}
+
+{# Célula da tabela: "—" quando vazio, sinal e cor para a linha de resultado #}
+{% macro cel(v, tipo) -%}
+  {%- if v is none -%}<td class="num vazio">—</td>
+  {%- elif tipo == 'resultado' -%}<td class="num {{ 'in' if v >= 0 else 'out' }}">{{ '+' if v > 0 else ('−' if v < 0 else '') }} {{ v|num }}</td>
+  {%- else -%}<td class="num">{{ v|num }}</td>
+  {%- endif -%}
+{%- endmacro %}
+
+<div class="page-head">
+  <div>
+    <h1>Relatórios</h1>
+    <p>{{ usuario.nome }} · Atualizado em {{ atualizado_em }}</p>
+  </div>
+</div>
+
+<section class="panel table-panel" style="margin-top: 0">
+  <header class="panel-head">
+    <h2>Relatório do período <small class="muted">Consolidado semanal por categoria · valores em R$</small></h2>
+    <div class="actions">
+      <a class="btn sm" href="{{ url_for('exportar_relatorio', formato='pdf', mes=mes, categoria=categoria) }}">Exportar PDF</a>
+      <a class="btn sm" href="{{ url_for('exportar_relatorio', formato='excel', mes=mes, categoria=categoria) }}">Exportar Excel</a>
+    </div>
+  </header>
+
+  <div class="table-wrap">
+    <table class="tbl rep">
+      <thead>
+        <tr>
+          <th>Descrição</th>
+          {% for s in f.semanas %}<th class="num">{{ s }}</th>{% endfor %}
+          <th class="num">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if tem_movimentos %}
+          {% for r in f.linhas %}
+            {% if r.tipo == 'secao' %}
+              <tr class="sec {{ r.tom }}"><td colspan="{{ f.semanas|length + 2 }}">{{ r.rotulo }}</td></tr>
+            {% else %}
+              <tr class="{{ r.tipo }}{% if r.tom %} {{ r.tom }}{% endif %}">
+                <td>{{ r.rotulo }}</td>
+                {% for v in r.valores %}{{ cel(v, r.tipo) }}{% endfor %}
+                {{ cel(r.total, r.tipo) }}
+              </tr>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="{{ f.semanas|length + 2 }}" style="text-align: center; padding: 32px; color: #6B7280;">
+              Nenhum lançamento registrado neste período para exibir no relatório.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

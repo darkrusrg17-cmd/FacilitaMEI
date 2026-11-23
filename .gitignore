@@ -1,0 +1,18 @@
+# Credenciais e dados locais
+.env
+dados_usuario.json
+
+# Dependências e cache do Node.js
+node_modules/
+npm-debug.log*
+
+# Dependências e cache do Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+
+# Sistema operacional e editor
+.DS_Store
+Thumbs.db

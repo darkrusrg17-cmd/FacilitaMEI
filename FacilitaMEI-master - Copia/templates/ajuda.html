@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% set active_menu = 'Ajuda' %}
+
+{% block title %}Ajuda{% endblock %}
+{% block crumbs %}<a href="#">Sistema</a><span>/</span><strong>Ajuda</strong>{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Ajuda</h1>
+    <p>Encontre respostas rápidas ou fale com o suporte.</p>
+  </div>
+</div>
+
+<div class="help-grid">
+  <section class="help-card">
+    <h2>Perguntas frequentes</h2>
+    <p class="hint">Digite uma palavra para filtrar as perguntas.</p>
+    <div class="control"><input type="text" id="busca-ajuda" placeholder="Buscar na ajuda…" aria-label="Buscar na ajuda"></div>
+
+    <div class="faq">
+      <details>
+        <summary>Como cadastro um cliente?</summary>
+        <p>Abra <strong>Clientes</strong> no menu, preencha os campos marcados com * e clique em <strong>Salvar cliente</strong>. Os campos obrigatórios que ficarem vazios aparecem em vermelho.</p>
+      </details>
+      <details>
+        <summary>Como cadastro um produto?</summary>
+        <p>Abra <strong>Produtos</strong>, informe nome, SKU, categoria, preço de venda e unidade, e clique em <strong>Salvar produto</strong>.</p>
+      </details>
+      <details>
+        <summary>O que significa "Margem estimada"?</summary>
+        <p>É a diferença entre o preço de venda e o custo do produto, mostrada em reais por unidade e em porcentagem sobre o preço. Ela é recalculada sozinha quando você muda o preço ou o custo.</p>
+      </details>
+      <details>
+        <summary>Como adiciono um lançamento?</summary>
+        <p>Em <strong>Lançamentos</strong>, clique em <strong>+ Adicionar lançamento</strong>, informe data, tipo (entrada ou saída), valor, descrição, categoria e forma de pagamento, e salve. O lançamento entra na tabela e os totais são atualizados.</p>
+      </details>
+      <details>
+        <summary>Como exporto o relatório do período?</summary>
+        <p>Abra <strong>Relatórios</strong> e clique em <strong>Exportar PDF</strong> ou <strong>Exportar Excel</strong>. O arquivo é baixado com os mesmos valores da tabela.</p>
+      </details>
+      <details>
+        <summary>Como altero meu nome e minha foto?</summary>
+        <p>Clique nos três pontinhos no canto inferior da barra lateral e escolha <strong>Editar perfil</strong>. Você pode trocar o nome, enviar uma foto nova ou remover a atual.</p>
+      </details>
+      <details>
+        <summary>Por que um campo fica vermelho ao salvar?</summary>
+        <p>Campos marcados com * são obrigatórios. O formulário só é salvo quando todos estiverem preenchidos, e o vermelho some assim que você preenche o campo.</p>
+      </details>
+      <p class="faq-vazio" id="faq-vazio" hidden>Nenhuma pergunta encontrada para essa busca.</p>
+    </div>
+  </section>
+
+  <aside class="help-side">
+    <section class="help-card help-contato">
+      <h2>Fale com o suporte</h2>
+      <p class="hint">Não encontrou o que procurava?</p>
+      <p>Envie um e-mail para <a href="mailto:suporte@facilitamei.com.br">suporte@facilitamei.com.br</a> descrevendo o que aconteceu.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>Atalhos</h2>
+      <div class="help-links">
+        <a href="{{ url_for('novo_cliente') }}">Cadastrar cliente {{ m.ico('arrow') }}</a>
+        <a href="{{ url_for('novo_produto') }}">Cadastrar produto {{ m.ico('arrow') }}</a>
+        <a href="{{ url_for('lancamentos') }}">Ver lançamentos {{ m.ico('arrow') }}</a>
+        <a href="{{ url_for('relatorios') }}">Exportar relatório {{ m.ico('arrow') }}</a>
+      </div>
+    </section>
+  </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var busca = document.getElementById("busca-ajuda");
+    var itens = document.querySelectorAll(".faq details");
+    var vazio = document.getElementById("faq-vazio");
+    busca.addEventListener("input", function () {
+      var termo = busca.value.trim().toLowerCase();
+      var achou = 0;
+      itens.forEach(function (d) {
+        var ok = !termo || d.textContent.toLowerCase().indexOf(termo) !== -1;
+        d.hidden = !ok;
+        if (ok) achou++;
+      });
+      vazio.hidden = achou > 0;
+    });
+  })();
+</script>
+{% endblock %}

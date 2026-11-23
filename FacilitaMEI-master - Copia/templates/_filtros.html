@@ -1,0 +1,27 @@
+{% import '_macros.html' as m %}
+<form class="actions filtros" method="get" action="">
+  <label class="chip chip-select">
+    {{ m.ico('calendar') }}
+    <span>{% for valor, rotulo in meses %}{% if valor == mes %}{{ rotulo }}{% endif %}{% endfor %}</span>
+    {{ m.ico('chevron') }}
+    <select name="mes" aria-label="Mês" onchange="this.form.submit()">
+      {% for valor, rotulo in meses %}
+        <option value="{{ valor }}" {% if valor == mes %}selected{% endif %}>{{ rotulo }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label class="chip chip-select">
+    {{ m.ico('filter') }}
+    <span>{{ categoria or 'Todas as categorias' }}</span>
+    {{ m.ico('chevron') }}
+    <select name="categoria" aria-label="Categoria" onchange="this.form.submit()">
+      <option value="">Todas as categorias</option>
+      {% for c in categorias %}
+        <option value="{{ c }}" {% if c == categoria %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <button class="chip" type="button">{{ m.ico('database') }}Todas as contas{{ m.ico('chevron') }}</button>
+</form>

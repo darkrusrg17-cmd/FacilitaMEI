@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta · facilitaMEI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 font-sans text-slate-800">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg max-w-xl w-full">
+        
+        <!-- Logo oficial -->
+        <div class="flex items-center gap-3 mb-6">
+            <span class="logo-box">
+                <svg viewBox="0 0 48 48" width="38" height="38" aria-hidden="true">
+                    <path d="M6 18 10 8h28l4 10z" fill="#1d4f91"/>
+                    <rect x="8" y="18" width="32" height="20" fill="#e9f0f9"/>
+                    <rect x="14" y="26" width="4" height="12" fill="#1d4f91"/>
+                    <rect x="22" y="22" width="4" height="16" fill="#1d4f91"/>
+                    <rect x="30" y="29" width="4" height="9" fill="#1d4f91"/>
+                    <circle cx="38" cy="12" r="7" fill="#2fa84f"/>
+                    <path d="m34.5 12 2.5 2.5 4-4.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <span class="brand-text" style="display: flex; flex-direction: column;">
+                <strong style="font-size: 16px; color: #1d4f91; line-height: 1.2;">facilita<span style="color: #2fa84f;">MEI</span></strong>
+                <small style="font-size: 8px; color: #666; font-weight: bold; letter-spacing: 0.5px;">GESTÃO FINANCEIRA</small>
+            </span>
+        </div>
+
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-slate-800">Criar nova conta</h1>
+            <p class="text-slate-500 text-sm mt-1">Cadastre-se para começar a gerir o seu negócio.</p>
+        </div>
+
+        <!-- Balão vermelho de erro (aparece apenas se houver erro) -->
+        {% if erro %}
+        <div class="mb-5 p-3 bg-red-100 border border-red-200 text-red-700 rounded-lg text-sm font-semibold text-center">
+            {{ erro }}
+        </div>
+        {% endif %}
+        
+        <form method="POST" action="/registrar" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Nome completo / Razão Social</label>
+                    <input type="text" name="nome" value="" autocomplete="off" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-[#1d4f91] focus:ring-1 focus:ring-[#1d4f91]" required>
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">CPF ou CNPJ</label>
+                    <input type="text" name="documento" id="documento" value="" autocomplete="off" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-[#1d4f91] focus:ring-1 focus:ring-[#1d4f91]" required>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">E-mail</label>
+                    <input type="email" name="email" value="" autocomplete="off" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-[#1d4f91] focus:ring-1 focus:ring-[#1d4f91]" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Senha</label>
+                    <input type="password" name="senha" value="" autocomplete="new-password" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-[#1d4f91] focus:ring-1 focus:ring-[#1d4f91]" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Confirmar Senha</label>
+                    <input type="password" name="confirmar_senha" value="" autocomplete="new-password" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-[#1d4f91] focus:ring-1 focus:ring-[#1d4f91]" required>
+                </div>
+            </div>
+            
+            <div class="mt-6 space-y-3 pt-2">
+                <button type="submit" class="w-full bg-[#153a6d] text-white font-semibold py-3 rounded-lg hover:bg-[#1d4f91] transition text-sm shadow-sm">Concluir Registro</button>
+                
+                <div class="text-center pt-2">
+                    <p class="text-sm text-slate-500">Já possui uma conta? 
+                        <a href="{{ url_for('login') }}" class="text-[#1d4f91] font-semibold hover:underline">Faça login</a>
+                    </p>
+                </div>
+            </div>
+        </form>
+    </div>
+<script>
+ 
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+
+    window.onload = function() {
+        const inputs = document.querySelectorAll("input");
+        inputs.forEach(input => {
+            if (input.type !== "submit" && input.type !== "hidden") {
+                input.value = "";
+            }
+        });
+    };
+</script>
+</body>
+</html>

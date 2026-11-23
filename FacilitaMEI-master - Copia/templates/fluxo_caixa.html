@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% set active_menu = 'Fluxo de caixa' %}
+
+{% block title %}Fluxo de caixa{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/fluxo.css') }}">
+{% endblock %}
+{% block crumbs %}<a href="#">Fluxo de caixa</a><span>/</span><strong>Visão do período</strong>{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Fluxo de caixa</h1>
+    <p>{{ usuario.nome }} · Atualizado em {{ atualizado_em }}</p>
+  </div>
+  {% include '_filtros.html' %}
+</div>
+
+<!-- Indicadores -->
+<section class="kpis">
+  {% for k in f.kpis %}
+  <article class="panel kpi">
+    <span class="kpi-label">{{ k.rotulo }}</span>
+    <strong class="kpi-value {{ k.tom }}">{{ k.valor|brls }}</strong>
+    <small>{{ k.nota }}</small>
+  </article>
+  {% endfor %}
+</section>
+
+<!-- Gráfico de linha + leitura do período -->
+<section class="row fluxo">
+  <article class="panel">
+    <header class="panel-head">
+      <h2>Evolução do saldo</h2>
+      <span class="muted">Saldo ao fim de cada semana</span>
+    </header>
+
+    <svg class="line-chart" viewBox="0 0 440 200" role="img" aria-label="Evolução do saldo ao longo do mês">
+      <defs>
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2f5d9a" stop-opacity=".18"/>
+          <stop offset="1" stop-color="#2f5d9a" stop-opacity=".04"/>
+        </linearGradient>
+      </defs>
+
+      {% for gr in grafico.grades %}
+        <line class="grid" x1="46" x2="436" y1="{{ gr.y }}" y2="{{ gr.y }}"/>
+        <text class="axis" x="38" y="{{ gr.y + 3 }}" text-anchor="end">{{ gr.rotulo }}</text>
+      {% endfor %}
+
+      <polygon points="{{ grafico.area }}" fill="url(#areaGrad)"/>
+      <polyline class="line" points="{{ grafico.linha }}" fill="none" stroke-linejoin="round"/>
+
+      {% for pt in grafico.pontos %}
+        <circle class="dot{% if loop.last %} last{% endif %}" cx="{{ pt.x }}" cy="{{ pt.y }}" r="3.5"/>
+        <text class="val" x="{{ pt.x }}" y="{{ pt.y - 9 }}">{{ pt.valor }}</text>
+        <text class="axis" x="{{ pt.x }}" y="190" text-anchor="middle">{{ pt.rotulo }}</text>
+      {% endfor %}
+    </svg>
+  </article>
+
+  <article class="panel">
+    <header class="panel-head"><h2>Leitura do período</h2></header>
+    <div class="read">
+      <div class="read-result{% if f.resultado < 0 %} neg{% endif %}">
+        <span>Resultado do período</span>
+        <strong>{{ '+' if f.resultado >= 0 else '−' }} {{ f.resultado|brl }}</strong>
+      </div>
+      {% for a in f.alertas %}
+        <p class="read-note {{ a.tom }}"><i></i><span>{{ a.texto }}</span></p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% set active_menu = 'Clientes' %}
+
+{% block title %}Clientes{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+{% block crumbs %}<a href="#">Cadastros</a><span>/</span><strong>Clientes</strong>{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Clientes</h1>
+    <p>Base de clientes cadastrados e condições comerciais · {{ total_clientes }} registros</p>
+  </div>
+  <div class="actions">
+    <a class="btn primary" href="{{ url_for('novo_cliente') }}">+ Cadastrar cliente</a>
+  </div>
+</div>
+
+<section class="panel table-panel" style="margin-top: 0;">
+  <header class="panel-head">
+    <h2>
+      Clientes cadastrados
+      <small class="muted">{{ ativos }} ativos · {{ inativos }} inativos</small>
+    </h2>
+  </header>
+
+  <div class="table-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Cliente / Razão Social</th>
+          <th>CPF / CNPJ</th>
+          <th>Contato</th>
+          <th>Cidade / UF</th>
+          <th>Status</th>
+          <th class="num">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in clientes %}
+        <tr>
+          <td>
+            <strong>{{ item.nome }}</strong>
+            {% if item.tipo_pessoa %}
+            <div class="muted" style="font-size: 12px; margin-top: 2px;">{{ item.tipo_pessoa }}</div>
+            {% endif %}
+          </td>
+          <td style="font-family: monospace; color: #4B5563;">{{ item.documento or '—' }}</td>
+          <td>
+            <div>{{ item.telefone or '—' }}</div>
+            {% if item.email %}
+            <div class="muted" style="font-size: 12px; margin-top: 2px;">{{ item.email }}</div>
+            {% endif %}
+          </td>
+          <td>
+            {% if item.cidade %}
+              {{ item.cidade }}{% if item.uf %} - {{ item.uf }}{% endif %}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>
+            {% if item.status == 'Ativo' %}
+              <span class="badge in">Ativo</span>
+            {% else %}
+              <span class="badge out">Inativo</span>
+            {% endif %}
+          </td>
+          <td class="num">
+            <a class="btn sm" href="{{ url_for('editar_cliente', cliente_id=item.id) }}">Editar</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 36px; color: #6B7280;">
+            Nenhum cliente cadastrado ainda. Clique em <strong>+ Cadastrar cliente</strong> para registrar o primeiro contato.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

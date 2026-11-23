@@ -1,0 +1,65 @@
+.lanc { margin-top: 0; }
+.lanc .panel-head { padding-bottom: 14px; }
+
+/* Botão "+ Adicionar lançamento" */
+.add-btn {
+  display: inline-flex; align-items: center; height: 30px; padding: 0 12px;
+  background: transparent; border: 0; border-radius: var(--radius);
+  font: 500 11.5px "Inter", sans-serif; color: var(--text); cursor: pointer;
+}
+.add-btn:hover { background: #f4f6f9; }
+
+/* Linhas da tabela */
+.lanc .tbl td { padding: 11px 16px; }
+.lanc .tbl tbody tr:hover td { background: #fafbfc; }
+.lanc .tbl th { white-space: nowrap; }
+
+/* Etiqueta neutra de status */
+.badge.ok { background: #eef1f5; color: #4a5666; }
+
+/* Barra de totais */
+.tot-bar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 32px;
+  padding: 14px 16px; background: #eaeff5; border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+}
+.tot-bar .label {
+  margin-right: auto; font-size: 10px; font-weight: 600;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.tot-bar .in, .tot-bar .out { font-weight: 600; }
+.tot-bar .in { color: var(--in); }
+.tot-bar .out { color: var(--out); }
+.tot-bar b { margin-right: 4px; }
+.tot-bar .saldo { color: var(--muted); }
+.tot-bar .saldo strong { margin-left: 4px; font-size: 13px; font-weight: 500; color: var(--text); }
+
+/* ---------- Janela "Adicionar lançamento" ---------- */
+.dlg {
+  width: min(760px, calc(100% - 32px)); padding: 0; border: 0; border-radius: 10px;
+  background: var(--surface); color: var(--text); font-family: "Inter", sans-serif;
+  box-shadow: 0 20px 50px rgba(17, 28, 43, .25);
+}
+.dlg::backdrop { background: rgba(17, 28, 43, .45); }
+
+.dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 20px 20px 0; }
+.dlg-head h2 { font-size: 15px; font-weight: 600; }
+.dlg-head p { margin-top: 4px; font-size: 11.5px; color: var(--muted); }
+.dlg-x { background: none; border: 0; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; }
+.dlg-x:hover { color: var(--text); }
+
+.dlg-body { padding: 18px 20px 22px; }
+
+.dlg-foot {
+  display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px;
+  background: #f8f9fb; border-top: 1px solid var(--border-soft);
+}
+
+/* Campos da janela */
+.dlg .grid { gap: 18px 16px; }
+.dlg .field label { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+.dlg .control input,
+.dlg .control select { height: 40px; font-size: 12.5px; }
+.dlg .control.has-icon .ico { top: 12px; }
+.dlg .control select:hover,
+.dlg .control input:hover { border-color: #c4cad2; }

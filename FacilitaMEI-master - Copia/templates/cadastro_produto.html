@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% set active_menu = 'Produtos' %}
+
+{% block title %}{{ 'Editar produto' if editando else 'Cadastrar produto' }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/produto.css') }}">{% endblock %}
+{% block crumbs %}<a href="{{ url_for('produtos') }}">Produtos</a><span>/</span><strong>{{ 'Editar produto' if editando else 'Novo produto' }}</strong>{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ 'Editar produto' if editando else 'Cadastrar produto' }}</h1>
+    <p>{{ 'Atualize os dados cadastrais, valores e parâmetros de estoque do produto.' if editando else 'Inclua um novo item no catálogo e configure seus dados de venda e estoque.' }}</p>
+  </div>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('cancelar_produto') }}">Cancelar</a>
+    <button class="btn primary" type="submit" form="form-produto">{{ m.ico('check') }}{{ 'Salvar alterações' if editando else 'Salvar produto' }}</button>
+  </div>
+</div>
+
+<form id="form-produto" class="card" method="post" autocomplete="off"
+      action="{{ url_for('editar_produto', produto_id=p.id) if editando else url_for('novo_produto') }}">
+
+  <section class="section">
+    <h2>Dados básicos</h2>
+    <p class="hint">Informações usadas para identificar o produto no catálogo.</p>
+    <div class="grid">
+      {{ m.field('Nome do produto', 'nome', p.nome, 4, true) }}
+      {{ m.field('SKU / código', 'sku', p.sku, 4, true) }}
+      {{ m.select('Categoria', 'categoria', op.categoria, p.categoria, 4, true) }}
+      <div class="field span-12">
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" name="descricao" rows="3">{{ p.descricao or '' }}</textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Comercial e estoque</h2>
+    <p class="hint">Defina valores, disponibilidade e parâmetros para reposição.</p>
+    <div class="grid">
+      {% set preco_fmt = (p.preco|num) if p.preco else '' %}
+      {% set custo_fmt = (p.custo|num) if p.custo else '' %}
+      {{ m.field('Preço de venda', 'preco', preco_fmt, 3, true, 'money') }}
+      {{ m.field('Custo', 'custo', custo_fmt, 3, false, 'money') }}
+      {{ m.field('Estoque inicial', 'estoque_inicial', p.estoque_inicial, 3, false, none, 'number') }}
+      {{ m.select('Unidade', 'unidade', op.unidade, p.unidade, 3, true) }}
+
+      {{ m.field('Estoque mínimo', 'estoque_minimo', p.estoque_minimo, 3, false, none, 'number') }}
+      {{ m.select('Status', 'status', op.status, p.status, 3, true) }}
+
+      <div class="field span-3">
+        <label>Margem estimada</label>
+        <div class="margin-box" aria-live="polite">
+          <strong id="margem-valor">—</strong>
+          <small id="margem-pct"></small>
+        </div>
+      </div>
+
+      <div class="field span-3">
+        <label for="controle_estoque">Controle de estoque</label>
+        <label class="switch-field">
+          <input type="checkbox" id="controle_estoque" name="controle_estoque" checked>
+          <span>Alerta ao atingir o estoque mínimo</span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <footer class="card-foot">
+    <span>* Campos obrigatórios</span>
+    <div class="actions">
+      <a class="btn" href="{{ url_for('cancelar_produto') }}">Cancelar</a>
+      <button class="btn primary" type="submit" form="form-produto">{{ m.ico('check') }}{{ 'Salvar alterações' if editando else 'Salvar produto' }}</button>
+    </div>
+  </footer>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/produto.js') }}"></script>
+{% if editando %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var preco = document.getElementById("preco");
+    if (preco) preco.dispatchEvent(new Event("input"));
+  });
+</script>
+{% endif %}
+{% endblock %}

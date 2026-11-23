@@ -1,0 +1,25 @@
+:root { --in: #12805c; --in-bg: #e3f4ec; --out: #b3403f; --out-bg: #fbeaea; }
+
+/* Caixa da margem estimada */
+.margin-box {
+  min-height: 36px; padding: 4px 12px; display: flex; flex-direction: column; justify-content: center;
+  background: var(--in-bg); border: 1px solid #cfe9dc; border-radius: var(--radius);
+  line-height: 1.3; color: var(--in);
+}
+.margin-box strong { font-size: 11.5px; font-weight: 600; }
+.margin-box small { font-size: 10px; }
+.margin-box.neg { background: var(--out-bg); border-color: #f1cfcf; color: var(--out); }
+
+/* Opção de alerta de estoque */
+.switch-field {
+  display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px;
+  background: #f8f9fb; border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 11px; font-weight: 400; color: var(--muted); cursor: pointer; margin: 0;
+}
+.switch-field input { accent-color: var(--navy); width: 14px; height: 14px; flex: none; }
+.switch-field span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* campos numéricos sem as setas do navegador */
+input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }

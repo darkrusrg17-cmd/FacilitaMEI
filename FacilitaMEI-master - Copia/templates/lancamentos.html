@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% set active_menu = 'Lançamentos' %}
+
+{% block title %}Lançamentos{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/lancamentos.css') }}">
+{% endblock %}
+{% block crumbs %}<a href="#">Financeiro</a><span>/</span><strong>Lançamentos</strong>{% endblock %}
+
+{% block content %}
+<section class="panel table-panel lanc">
+  <header class="panel-head">
+    <h2>Lançamentos do período <small class="muted">{{ l.total_registros }} registros</small></h2>
+    <button class="add-btn" id="abrir-lancamento" type="button">+ Adicionar lançamento</button>
+  </header>
+
+  <div class="table-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Descrição</th>
+          <th>Categoria</th>
+          <th>Tipo</th>
+          <th>Forma de pagamento</th>
+          <th class="num">Valor</th>
+          <th>Status</th>
+          <th class="num">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in l.itens %}
+        {% set entrada = i.tipo == 'Entrada' %}
+        <tr>
+          <td>{{ i.data }}</td>
+          <td>{{ i.descricao }}</td>
+          <td>{{ i.categoria }}</td>
+          <td><span class="badge {{ 'in' if entrada else 'out' }}">{{ i.tipo }}</span></td>
+          <td>{{ i.forma }}</td>
+          <td class="num {{ 'in' if entrada else 'out' }}">{{ '+' if entrada else '−' }} {{ i.valor|brl }}</td>
+          <td><span class="badge ok">{{ i.status or 'Confirmado' }}</span></td>
+          <td class="num">
+            <form method="post" action="{{ url_for('excluir_lancamento', lancamento_id=i.id) }}" style="display:inline;" onsubmit="return confirm('Deseja realmente excluir este lançamento?');">
+              <button type="submit" title="Excluir lançamento" style="background:none;border:0;color:#b3403f;cursor:pointer;padding:4px 6px;border-radius:6px;display:inline-flex;align-items:center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" style="text-align:center; padding:32px; color:#6B7280;">
+            Nenhum lançamento registrado ainda. Clique em <strong>+ Adicionar lançamento</strong> para começar.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="tot-bar">
+    <span class="label">Total do período</span>
+    <span class="in"><b>Entradas</b> {{ l.totais.entradas|brl }}</span>
+    <span class="out"><b>Saídas</b> {{ l.totais.saidas|brl }}</span>
+    <span class="saldo">Saldo <strong>{{ l.totais.saldo|brl }}</strong></span>
+  </footer>
+</section>
+
+<!-- Janela: adicionar lançamento -->
+<dialog id="dlg-lancamento" class="dlg">
+  <form method="post" action="{{ url_for('novo_lancamento') }}" autocomplete="off">
+    <header class="dlg-head">
+      <div>
+        <h2>Adicionar lançamento</h2>
+        <p>Registre uma entrada ou saída no fluxo de caixa.</p>
+      </div>
+      <button type="button" class="dlg-x" data-fechar aria-label="Fechar">×</button>
+    </header>
+
+    <div class="grid dlg-body">
+      {{ m.field('Data', 'data', hoje, 4, true, none, 'date') }}
+      {{ m.select('Tipo', 'tipo', tipos, '', 4, true) }}
+      {{ m.field('Valor', 'valor', '', 4, true, 'money') }}
+      {{ m.field('Descrição', 'descricao', '', 12, true) }}
+      {{ m.select('Categoria', 'categoria', cats, '', 6, true) }}
+      {{ m.select('Forma de pagamento', 'forma', formas, '', 6, true) }}
+    </div>
+
+    <footer class="dlg-foot">
+      <a class="btn" href="{{ url_for('lancamentos', aviso='cancelado') }}">Cancelar</a>
+      <button class="btn primary" type="submit">{{ m.ico('check') }}Salvar lançamento</button>
+    </footer>
+  </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var dlg = document.getElementById("dlg-lancamento");
+    var valor = document.getElementById("valor");
+
+    document.getElementById("abrir-lancamento").addEventListener("click", function () {
+      dlg.showModal();
+    });
+    dlg.querySelectorAll("[data-fechar]").forEach(function (b) {
+      b.addEventListener("click", function () { dlg.close(); });
+    });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+
+    valor.addEventListener("input", function () {
+      var c = parseInt(valor.value.replace(/\D/g, "") || "0", 10);
+      valor.value = c
+        ? "R$ " + (c / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : "";
+    });
+  })();
+</script>
+{% endblock %}

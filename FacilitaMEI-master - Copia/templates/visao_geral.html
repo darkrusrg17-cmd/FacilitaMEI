@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% set active_menu = 'Visão geral' %}
+
+{% block title %}Visão geral{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">{% endblock %}
+{% block crumbs %}<a href="#">Painel</a><span>/</span><strong>Visão geral</strong>{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Visão geral</h1>
+    <p>{{ usuario.nome }} · Atualizado em {{ atualizado_em }}</p>
+  </div>
+  {% include '_filtros.html' %}
+</div>
+
+<!-- Indicadores -->
+<section class="kpis">
+  {% for k in p.kpis %}
+  <article class="panel kpi">
+    <span class="kpi-label">{{ k.rotulo }}</span>
+    <strong class="kpi-value {{ k.tom }}">{{ k.valor|brls }}</strong>
+    <small>{{ k.nota }}</small>
+  </article>
+  {% endfor %}
+</section>
+
+<!-- Gráfico + vencimentos -->
+<section class="row">
+  <article class="panel">
+    <header class="panel-head">
+      <h2>Entradas e saídas por semana</h2>
+      <div class="legend">
+        <span><i class="sq in"></i>Entradas</span>
+        <span><i class="sq out"></i>Saídas</span>
+      </div>
+    </header>
+
+    <div class="chart" role="img" aria-label="Gráfico de barras com entradas e saídas por semana">
+      <div class="plot">
+        {% for t in p.escala.ticks %}
+          <div class="gl" style="bottom: {{ t / p.escala.topo * 100 }}%"><span>{{ t|mil }}</span></div>
+        {% endfor %}
+        <div class="weeks">
+          {% for s in p.semanas %}
+          <div class="week">
+            <i class="bar in" style="height: {{ s.entradas / p.escala.topo * 100 }}%"></i>
+            <i class="bar out" style="height: {{ s.saidas / p.escala.topo * 100 }}%"></i>
+            <span class="wl">{{ s.rotulo }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="panel">
+    {% set meses_nomes = {'01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril', '05': 'Maio', '06': 'Junho', '07': 'Julho', '08': 'Agosto', '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'} %}
+    <header class="panel-head">
+      <h2>Próximos vencimentos</h2>
+      <span class="muted">{{ meses_nomes.get(mes[5:7], '') ~ ' ' ~ mes[:4] if mes|length >= 7 else mes }}</span>
+    </header>
+    <ul class="due">
+      {% for v in p.vencimentos %}
+      <li>
+        <div><strong>{{ v.nome }}</strong><small>{{ v.data }} · {{ v.prazo }}</small></div>
+        <b>{{ v.valor|brl }}</b>
+      </li>
+      {% else %}
+      <li><span class="muted">Nenhum vencimento nesta categoria.</span></li>
+      {% endfor %}
+    </ul>
+  </article>
+</section>
+
+<!-- Últimos lançamentos -->
+<section class="panel table-panel">
+  <header class="panel-head">
+    <h2>Últimos lançamentos <small class="muted">{{ p.total_registros }} registros no período</small></h2>
+    <a class="link" href="{{ url_for('lancamentos') }}">Ver todos os lançamentos {{ m.ico('arrow') }}</a>
+  </header>
+
+  <div class="table-wrap">
+    <table class="tbl">
+      <thead>
+        <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th class="num">Valor</th></tr>
+      </thead>
+      <tbody>
+        {% for l in p.lancamentos %}
+        <tr>
+          <td>{{ l.data }}</td>
+          <td>{{ l.descricao }}</td>
+          <td>{{ l.categoria }}</td>
+          <td><span class="badge {{ 'in' if l.tipo == 'Entrada' else 'out' }}">{{ l.tipo }}</span></td>
+          <td class="num {{ 'in' if l.tipo == 'Entrada' else 'out' }}">{{ '+' if l.tipo == 'Entrada' else '−' }} {{ l.valor|brl }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" style="text-align:center;color:var(--muted)">Nenhum lançamento para este filtro.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

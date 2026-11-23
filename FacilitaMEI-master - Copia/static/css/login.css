@@ -1,0 +1,62 @@
+.login-page {
+  min-height: 100vh; display: grid; place-items: center; padding: 24px;
+  background: var(--bg);
+}
+
+.login-card {
+  width: 100%; max-width: 400px; padding: 34px 34px 28px;
+  background: var(--surface); border: 1px solid var(--border-soft);
+  border-radius: 12px; box-shadow: 0 1px 2px rgba(17, 28, 43, .04), 0 8px 24px rgba(17, 28, 43, .05);
+}
+
+/* Logo */
+.login-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 34px; }
+.logo-box { width: 92px; height: 92px; display: grid; place-items: center; background: #f4f5f7; border-radius: 4px; flex: none; }
+.login-brand .brand-text strong { font-size: 16px; }
+.login-brand .brand-text small { font-size: 9px; }
+
+/* Títulos */
+.login-card h1 { font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+.sub { margin: 6px 0 26px; font-size: 13px; color: var(--muted); }
+
+/* Campos */
+.campo { margin-bottom: 18px; }
+.campo label { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 600; color: var(--text); }
+.login-card .control input {
+  height: 42px; padding: 0 14px; font-size: 13px;
+}
+.login-card .control.has-icon input { padding-left: 38px; }
+.login-card .control.has-icon .ico { top: 14px; left: 14px; width: 15px; height: 15px; }
+
+/* Mensagem de erro */
+.erro {
+  margin-bottom: 16px; padding: 10px 12px; border-radius: var(--radius);
+  background: #fbeaea; border: 1px solid #f1cfcf; color: #b3403f; font-size: 12px;
+}
+
+/* Lembrar / esqueci */
+.opcoes { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 22px; }
+.lembrar { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); cursor: pointer; }
+.lembrar input {
+  appearance: none; -webkit-appearance: none; width: 16px; height: 16px; margin: 0;
+  border: 1.5px solid var(--border); border-radius: 3px; background: #fff; cursor: pointer; flex: none;
+}
+.lembrar input:checked {
+  background: var(--navy) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center / 11px no-repeat;
+  border-color: var(--navy);
+}
+.lembrar input:focus-visible { outline: 2px solid #3b7ddd; outline-offset: 2px; }
+.esqueci { font-size: 12px; font-weight: 600; color: var(--navy); }
+.esqueci:hover { text-decoration: underline; }
+
+/* Botão Entrar */
+.entrar { width: 100%; justify-content: center; height: 42px; font-size: 12.5px; }
+
+/* Rodapé do card */
+.ajuda { margin-top: 26px; text-align: center; font-size: 11px; color: var(--muted); }
+.ajuda a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+  .login-card { padding: 26px 20px 22px; }
+  .logo-box { width: 72px; height: 72px; }
+}

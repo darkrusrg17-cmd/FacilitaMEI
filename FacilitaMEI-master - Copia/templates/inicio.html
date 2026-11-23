@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Início · facilitaMEI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 font-sans text-slate-800">
+
+    <!-- TELA INICIAL (GATEWAY) -->
+    <div class="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+        
+        <!-- Logo oficial -->
+        <div class="flex items-center gap-3 mb-6">
+            <span class="logo-box">
+                <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true">
+                    <path d="M6 18 10 8h28l4 10z" fill="#1d4f91"/>
+                    <rect x="8" y="18" width="32" height="20" fill="#e9f0f9"/>
+                    <rect x="14" y="26" width="4" height="12" fill="#1d4f91"/>
+                    <rect x="22" y="22" width="4" height="16" fill="#1d4f91"/>
+                    <rect x="30" y="29" width="4" height="9" fill="#1d4f91"/>
+                    <circle cx="38" cy="12" r="7" fill="#2fa84f"/>
+                    <path d="m34.5 12 2.5 2.5 4-4.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <span class="brand-text" style="display: flex; flex-direction: column;">
+                <strong style="font-size: 18px; color: #1d4f91; line-height: 1.2;">facilita<span style="color: #2fa84f;">MEI</span></strong>
+                <small style="font-size: 9px; color: #666; font-weight: bold; letter-spacing: 0.5px;">GESTÃO FINANCEIRA</small>
+            </span>
+        </div>
+
+        <h1 class="text-2xl font-bold text-slate-800 mb-2">Bem-vindo(a)</h1>
+        <p class="text-slate-500 mb-8 text-sm">A plataforma ideal para gerir o seu negócio de forma simples e eficaz.</p>
+        
+        <div class="space-y-4">
+            <a href="{{ url_for('login') }}" class="block w-full bg-[#153a6d] text-white font-semibold py-3 rounded-lg hover:bg-[#1d4f91] transition text-center text-sm shadow-sm">Já tenho conta</a>
+            
+            <a href="{{ url_for('pagina_registro') }}" class="block w-full border-2 border-[#1d4f91] text-[#1d4f91] font-semibold py-3 rounded-lg hover:bg-slate-50 transition text-center text-sm">Criar nova conta</a>
+        </div>
+    </div>
+
+</body>
+</html>

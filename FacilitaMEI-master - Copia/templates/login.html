@@ -1,0 +1,213 @@
+{% import '_macros.html' as m %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · facilitaMEI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+
+<style>
+  :is(.field, .campo).invalido label { color: #b3403f; }
+  :is(.field, .campo).invalido .control input,
+  :is(.field, .campo).invalido .control select,
+  :is(.field, .campo).invalido textarea {
+    border-color: #b3403f !important;
+    background-color: #fdf5f5;
+  }
+  :is(.field, .campo).invalido .control .ico { color: #b3403f; }
+  .msg-erro { margin-top: 5px; font-size: 10.5px; font-weight: 500; color: #b3403f; }
+</style>
+
+<script>
+(function () {
+  function recipiente(el) { return el.closest(".field, .campo") || el.parentElement; }
+
+  function limpar(el) {
+    var box = recipiente(el);
+    box.classList.remove("invalido");
+    var m = box.querySelector(".msg-erro");
+    if (m) m.remove();
+    el.removeAttribute("aria-invalid");
+  }
+
+  function erro(el) {
+    if (el.required && el.value.trim() === "") return "Campo obrigatório";
+    if (!el.checkValidity()) return "Informe um valor válido";
+    return "";
+  }
+
+  function marcar(el, texto) {
+    limpar(el);
+    recipiente(el).classList.add("invalido");
+    el.setAttribute("aria-invalid", "true");
+    var p = document.createElement("p");
+    p.className = "msg-erro";
+    p.textContent = texto;
+    (el.closest(".control") || el).insertAdjacentElement("afterend", p);
+  }
+
+  function campos(form) {
+    return Array.prototype.filter.call(
+      form.querySelectorAll("input, select, textarea"),
+      function (el) { return el.type !== "hidden" && el.type !== "checkbox" && !el.disabled; }
+    );
+  }
+
+  document.querySelectorAll("form").forEach(function (form) {
+    form.setAttribute("novalidate", "");
+
+    form.addEventListener("submit", function (e) {
+      var primeiro = null;
+      campos(form).forEach(function (el) {
+        var msg = erro(el);
+        if (msg) { marcar(el, msg); if (!primeiro) primeiro = el; }
+        else { limpar(el); }
+      });
+      if (primeiro) {
+        e.preventDefault();
+        primeiro.focus();
+        primeiro.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    });
+
+    function reavaliar(e) {
+      var el = e.target;
+      if (el.closest && recipiente(el).classList.contains("invalido") && !erro(el)) limpar(el);
+    }
+    form.addEventListener("input", reavaliar);
+    form.addEventListener("change", reavaliar);
+  });
+})();
+</script>
+
+<body class="login-page">
+
+  <main class="login-card">
+    <a class="login-brand" href="{{ url_for('login') }}">
+      <span class="logo-box">
+        <svg viewBox="0 0 48 48" width="52" height="52" aria-hidden="true">
+          <path d="M6 18 10 8h28l4 10z" fill="#1d4f91"/>
+          <rect x="8" y="18" width="32" height="20" fill="#e9f0f9"/>
+          <rect x="14" y="26" width="4" height="12" fill="#1d4f91"/>
+          <rect x="22" y="22" width="4" height="16" fill="#1d4f91"/>
+          <rect x="30" y="29" width="4" height="9" fill="#1d4f91"/>
+          <circle cx="38" cy="12" r="7" fill="#2fa84f"/>
+          <path d="m34.5 12 2.5 2.5 4-4.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <strong>facilita<b>MEI</b></strong>
+        <small>GESTÃO FINANCEIRA</small>
+      </span>
+    </a>
+
+    <h1>Bem-vindo de volta</h1>
+    <p class="sub">Entre com seus dados para acessar o painel.</p>
+
+    <form method="post" action="{{ url_for('login') }}" novalidate>
+
+      {% if erro %}
+        <p class="erro" role="alert">{{ erro }}</p>
+      {% endif %}
+
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <div class="control has-icon">
+          {{ m.ico('mail') }}
+          <input type="email" id="email" name="email" value="{{ email }}"
+                 autocomplete="username" required autofocus>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <div class="control">
+          <input type="password" id="senha" name="senha"
+                 autocomplete="current-password" required>
+        </div>
+      </div>
+
+      <div class="opcoes">
+        <label class="lembrar">
+          <input type="checkbox" name="lembrar" checked>
+          <span>Lembrar meu acesso</span>
+        </label>
+        <a href="#" class="esqueci">Esqueci minha senha</a>
+      </div>
+
+      <button class="btn primary entrar" type="submit">Entrar</button>
+    </form>
+
+    <p class="ajuda">Precisa de ajuda? <a href="#">Fale com o suporte</a></p>
+  </main>
+
+  {% set mensagens = get_flashed_messages(with_categories=true) %}
+{% if mensagens or request.args.get('aviso') == 'registrado' %}
+<div id="toast-registro" style="
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #12805C;
+    color: #ffffff;
+    padding: 14px 18px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+">
+    <span style="
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        font-weight: 700;
+    ">✓</span>
+    <div>
+        <div style="font-weight: 600;">Registro concluído!</div>
+        <div style="font-size: 12.5px; opacity: 0.92;">Sua conta foi criada. Faça login para continuar.</div>
+    </div>
+    <button type="button" onclick="fecharToastRegistro()" style="
+        background: none;
+        border: none;
+        color: #ffffff;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        margin-left: 6px;
+        opacity: 0.85;
+    " aria-label="Fechar">&times;</button>
+</div>
+
+<script>
+    function fecharToastRegistro() {
+        var toast = document.getElementById('toast-registro');
+        if (!toast) return;
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(function () { toast.remove(); }, 350);
+    }
+    setTimeout(fecharToastRegistro, 5000);
+    if (window.history.replaceState) {
+        var url = new URL(window.location.href);
+        url.searchParams.delete('aviso');
+        window.history.replaceState(null, '', url.toString());
+    }
+</script>
+{% endif %}
+
+</body>
+</html>

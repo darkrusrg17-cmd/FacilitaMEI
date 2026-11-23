@@ -1,0 +1,302 @@
+{% import '_macros.html' as m %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %} · facilitaMEI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+{% set menu = [
+  ('Visão geral', 'grid', 'visao_geral'),
+  ('Fluxo de caixa', 'flow', 'fluxo_caixa'),
+  ('Lançamentos', 'list', 'lancamentos'),
+  ('Produtos', 'box', 'produtos'),
+  ('Clientes', 'users', 'clientes'),
+  ('Relatórios', 'chart', 'relatorios'),
+] %}
+
+<div class="app">
+
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('visao_geral') }}">
+      <span class="brand-mark">
+        <svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">
+          <path d="M6 18 10 8h28l4 10z" fill="#1d4f91"/>
+          <rect x="8" y="18" width="32" height="20" fill="#e9f0f9"/>
+          <rect x="14" y="26" width="4" height="12" fill="#1d4f91"/>
+          <rect x="22" y="22" width="4" height="16" fill="#1d4f91"/>
+          <rect x="30" y="29" width="4" height="9" fill="#1d4f91"/>
+          <circle cx="38" cy="12" r="7" fill="#2fa84f"/>
+          <path d="m34.5 12 2.5 2.5 4-4.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <strong>facilita<b>MEI</b></strong>
+        <small>GESTÃO FINANCEIRA</small>
+      </span>
+    </a>
+
+    <nav class="nav">
+      {% for label, icon, endpoint in menu %}
+        <a href="{{ url_for(endpoint) if endpoint else '#' }}" class="nav-item{% if label == active_menu %} active{% endif %}">{{ m.ico(icon) }}<span>{{ label }}</span></a>
+      {% endfor %}
+      <div class="nav-gap"></div>
+      <a href="{{ url_for('configuracoes') }}" class="nav-item{% if active_menu == 'Configurações' %} active{% endif %}">{{ m.ico('sliders') }}<span>Configurações</span></a>
+      <a href="{{ url_for('ajuda') }}" class="nav-item{% if active_menu == 'Ajuda' %} active{% endif %}">{{ m.ico('help') }}<span>Ajuda</span></a>
+    </nav>
+
+    <div class="user">
+      {% if usuario.foto %}
+        <img class="avatar" src="{{ url_for('static', filename=usuario.foto) }}?v={{ usuario.versao }}" alt="Foto de {{ usuario.nome }}">
+      {% else %}
+        <span class="avatar">{{ usuario.iniciais }}</span>
+      {% endif %}
+      <span class="user-info"><strong>{{ usuario.nome }}</strong><small>{{ usuario.cargo }}</small></span>
+      <button class="user-menu-btn" id="btn-user-menu" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Opções do usuário">{{ m.ico('dots') }}</button>
+      <div class="user-menu" id="user-menu" hidden>
+        <button type="button" id="abrir-perfil">Editar perfil</button>
+        <a href="{{ url_for('logout') }}">Sair</a>
+      </div>
+    </div>
+
+    <dialog id="dlg-perfil" class="dlg dlg-perfil">
+      <form method="post" action="{{ url_for('salvar_perfil') }}" enctype="multipart/form-data" autocomplete="off">
+        <header class="dlg-head">
+          <div><h2>Editar perfil</h2><p>Altere seu nome e sua foto.</p></div>
+          <button type="button" class="dlg-x" data-fechar aria-label="Fechar">×</button>
+        </header>
+
+        <div class="perfil-body">
+          <div class="perfil-foto">
+            <span class="avatar grande" id="prev-foto">{% if usuario.foto %}<img src="{{ url_for('static', filename=usuario.foto) }}?v={{ usuario.versao }}" alt="">{% else %}{{ usuario.iniciais }}{% endif %}</span>
+            <div>
+              <label class="btn sm" for="foto">Escolher foto</label>
+              <input type="file" id="foto" name="foto" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+              <p class="foto-dica" id="foto-dica">PNG, JPG, WEBP ou GIF, até 3 MB.</p>
+              {% if usuario.foto %}<label class="remover-foto"><input type="checkbox" name="remover_foto"> Remover foto atual</label>{% endif %}
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="perfil-nome">Nome *</label>
+            <div class="control"><input type="text" id="perfil-nome" name="nome" value="{{ usuario.nome }}" maxlength="60" required></div>
+          </div>
+        </div>
+
+        <footer class="dlg-foot">
+          <a class="btn" href="?aviso=cancelado">Cancelar</a>
+          <button class="btn primary" type="submit">{{ m.ico('check') }}Salvar</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <script>
+    (function () {
+      var btn = document.getElementById("btn-user-menu");
+      var menu = document.getElementById("user-menu");
+      var dlg = document.getElementById("dlg-perfil");
+      var form = dlg.querySelector("form");
+      var input = document.getElementById("foto");
+      var prev = document.getElementById("prev-foto");
+      var dica = document.getElementById("foto-dica");
+      var prevOriginal = prev.innerHTML;
+      var dicaOriginal = dica.textContent;
+
+      function fecharMenu() { menu.hidden = true; btn.setAttribute("aria-expanded", "false"); }
+
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        menu.hidden = !menu.hidden;
+        btn.setAttribute("aria-expanded", String(!menu.hidden));
+      });
+      document.addEventListener("click", function (e) { if (!menu.contains(e.target)) fecharMenu(); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") fecharMenu(); });
+
+      document.getElementById("abrir-perfil").addEventListener("click", function () {
+        fecharMenu();
+        form.reset();
+        prev.innerHTML = prevOriginal;
+        dica.textContent = dicaOriginal;
+        dica.classList.remove("erro");
+        form.querySelectorAll(".invalido").forEach(function (b) { b.classList.remove("invalido"); });
+        form.querySelectorAll(".msg-erro").forEach(function (p) { p.remove(); });
+        dlg.showModal();
+      });
+
+      dlg.querySelectorAll("[data-fechar]").forEach(function (b) {
+        b.addEventListener("click", function () { dlg.close(); });
+      });
+      dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+
+      input.addEventListener("change", function () {
+        var arq = input.files[0];
+        dica.classList.remove("erro");
+        if (!arq) { prev.innerHTML = prevOriginal; dica.textContent = dicaOriginal; return; }
+        if (arq.size > 3 * 1024 * 1024) {
+          input.value = "";
+          prev.innerHTML = prevOriginal;
+          dica.textContent = "Arquivo muito grande. O limite é 3 MB.";
+          dica.classList.add("erro");
+          return;
+        }
+        var img = document.createElement("img");
+        img.src = URL.createObjectURL(arq);
+        img.alt = "";
+        prev.innerHTML = "";
+        prev.appendChild(img);
+        dica.textContent = arq.name;
+      });
+    })();
+    </script>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumbs">{% block crumbs %}{% endblock %}</div>
+      <div class="status">{{ m.ico('bell') }}<span class="dot"></span>Sistema operacional</div>
+    </header>
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+{# ---------- Avisos flutuantes (?aviso=...) ---------- #}
+{% set aviso = request.args.get('aviso') %}
+{% set msgs_aviso = {
+  'salvo': 'Salvo com sucesso!',
+  'editado': 'Atualizado com sucesso!',
+  'excluido': 'Excluído com sucesso!',
+  'cancelado': 'Cancelado'
+} %}
+{% if aviso in msgs_aviso %}
+<style>
+  .toasts { position: fixed; top: 58px; right: 28px; z-index: 9999; }
+  .toast {
+    display: flex; align-items: center; gap: 10px; min-width: 280px; padding: 12px 14px;
+    background: #e3f4ec; border: 1px solid #cfe9dc; border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(17, 28, 43, .12);
+    font: 500 12px "Inter", sans-serif; color: #12805c;
+    transition: opacity .25s, transform .25s;
+  }
+  .toast .toast-icone { font-size: 14px; font-weight: 700; }
+  .toast .toast-texto { flex: 1; }
+  .toast button { background: none; border: 0; padding: 0 2px; font-size: 18px; line-height: 1; color: inherit; cursor: pointer; opacity: .7; }
+  .toast button:hover { opacity: 1; }
+  .toast.cancelado { background: #eef1f5; border-color: #dfe3e8; color: #3a4655; }
+  .toast.excluido { background: #fdf5f5; border-color: #f3d2d2; color: #b3403f; }
+  .toast.saindo { opacity: 0; transform: translateY(-6px); }
+  @media (max-width: 960px) { .toasts { left: 16px; right: 16px; } }
+</style>
+
+<div class="toasts" role="status" aria-live="polite">
+  <div class="toast {{ aviso }}">
+    <span class="toast-icone">{{ '✕' if aviso == 'cancelado' else '✓' }}</span>
+    <span class="toast-texto">{{ msgs_aviso[aviso] }}</span>
+    <button type="button" aria-label="Fechar aviso">×</button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var t = document.querySelector('.toast');
+    var fechar = function () {
+      t.classList.add('saindo');
+      setTimeout(function () { t.remove(); }, 250);
+    };
+    t.querySelector('button').addEventListener('click', fechar);
+    setTimeout(fechar, 5000);
+
+    var url = new URL(window.location.href);
+    url.searchParams.delete('aviso');
+    window.history.replaceState(null, '', url.toString());
+  })();
+</script>
+{% endif %}
+
+{# ---------- Validação de campos obrigatórios ---------- #}
+<style>
+  :is(.field, .campo).invalido label { color: #b3403f; }
+  :is(.field, .campo).invalido .control input,
+  :is(.field, .campo).invalido .control select,
+  :is(.field, .campo).invalido textarea {
+    border-color: #b3403f !important;
+    background-color: #fdf5f5;
+  }
+  :is(.field, .campo).invalido .control .ico { color: #b3403f; }
+  .msg-erro { margin-top: 5px; font-size: 10.5px; font-weight: 500; color: #b3403f; }
+</style>
+
+<script>
+(function () {
+  function recipiente(el) { return el.closest(".field, .campo") || el.parentElement; }
+
+  function limpar(el) {
+    var box = recipiente(el);
+    box.classList.remove("invalido");
+    var m = box.querySelector(".msg-erro");
+    if (m) m.remove();
+    el.removeAttribute("aria-invalid");
+  }
+
+  function erro(el) {
+    if (el.required && el.value.trim() === "") return "Campo obrigatório";
+    if (!el.checkValidity()) return "Informe um valor válido";
+    return "";
+  }
+
+  function marcar(el, texto) {
+    limpar(el);
+    recipiente(el).classList.add("invalido");
+    el.setAttribute("aria-invalid", "true");
+    var p = document.createElement("p");
+    p.className = "msg-erro";
+    p.textContent = texto;
+    (el.closest(".control") || el).insertAdjacentElement("afterend", p);
+  }
+
+  function campos(form) {
+    return Array.prototype.filter.call(
+      form.querySelectorAll("input, select, textarea"),
+      function (el) { return el.type !== "hidden" && el.type !== "checkbox" && !el.disabled; }
+    );
+  }
+
+  document.querySelectorAll("form").forEach(function (form) {
+    form.setAttribute("novalidate", "");
+
+    form.addEventListener("submit", function (e) {
+      var primeiro = null;
+      campos(form).forEach(function (el) {
+        var msg = erro(el);
+        if (msg) { marcar(el, msg); if (!primeiro) primeiro = el; }
+        else { limpar(el); }
+      });
+      if (primeiro) {
+        e.preventDefault();
+        primeiro.focus();
+        primeiro.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    });
+
+    function reavaliar(e) {
+      var el = e.target;
+      if (el.closest && recipiente(el).classList.contains("invalido") && !erro(el)) limpar(el);
+    }
+    form.addEventListener("input", reavaliar);
+    form.addEventListener("change", reavaliar);
+  });
+})();
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

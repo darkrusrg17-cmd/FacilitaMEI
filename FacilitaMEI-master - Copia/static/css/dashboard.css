@@ -1,0 +1,94 @@
+:root { --in: #12805c; --out: #b3403f; --in-bg: #e3f4ec; --out-bg: #fbeaea; }
+
+.content { max-width: 1180px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  font: 500 11.5px "Inter", sans-serif; color: var(--text); cursor: pointer;
+}
+.chip .ico { width: 14px; height: 14px; color: var(--muted); }
+.chip:hover { background: #f4f6f9; }
+
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 0; }
+.panel-head h2 { font-size: 12.5px; font-weight: 600; }
+.panel-head h2 small { margin-left: 8px; font-weight: 400; font-size: 11px; }
+.muted { color: var(--muted); font-size: 11px; }
+
+/* ---------- Indicadores ---------- */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.kpi { padding: 14px 16px; }
+.kpi-label { display: block; font-size: 9.5px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: #3a4655; }
+.kpi-value { display: block; margin: 8px 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+.kpi-value.in { color: var(--in); }
+.kpi-value.out { color: var(--out); }
+.kpi small { font-size: 10px; color: var(--muted); }
+
+/* ---------- Gráfico + vencimentos ---------- */
+.row { display: grid; grid-template-columns: 1.9fr 1fr; gap: 12px; margin-top: 12px; }
+
+.legend { display: flex; gap: 14px; font-size: 10.5px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sq { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.sq.in, .bar.in { background: var(--in); }
+.sq.out, .bar.out { background: var(--out); }
+
+.chart { position: relative; height: 230px; margin: 12px 16px 0; }
+.plot { position: absolute; left: 44px; right: 0; top: 8px; bottom: 30px; }
+.gl { position: absolute; left: 0; right: 0; border-top: 1px solid var(--border-soft); }
+.gl span { position: absolute; left: -44px; width: 38px; text-align: right; top: -7px; font-size: 9.5px; color: var(--muted); }
+
+.weeks { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: 100%; }
+.week { position: relative; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
+.bar { display: block; width: 24px; border-radius: 2px 2px 0 0; }
+.wl { position: absolute; top: 100%; margin-top: 8px; font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+
+.due { list-style: none; padding: 6px 16px 10px; }
+.due li {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 11px 0; border-bottom: 1px solid var(--border-soft);
+}
+.due li:last-child { border-bottom: 0; }
+.due strong { display: block; font-size: 11.5px; font-weight: 500; }
+.due small { font-size: 10px; color: var(--muted); }
+.due b { font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+/* ---------- Tabela ---------- */
+.table-panel { margin-top: 12px; overflow: hidden; padding-bottom: 0; }
+.table-panel .panel-head { padding-bottom: 12px; }
+.link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 500; }
+.link .ico { width: 12px; height: 12px; }
+.link:hover { text-decoration: underline; }
+
+.table-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.tbl th {
+  text-align: left; padding: 10px 16px; background: #eef1f5; color: var(--muted);
+  font-size: 9.5px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase;
+}
+.tbl td { padding: 15px 16px; border-top: 1px solid var(--border-soft); white-space: nowrap; }
+.tbl .num { text-align: right; font-weight: 600; }
+.tbl td.in { color: var(--in); }
+.tbl td.out { color: var(--out); }
+
+.badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 500; }
+.badge.in { background: var(--in-bg); color: var(--in); }
+.badge.out { background: var(--out-bg); color: var(--out); }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 1100px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .row { grid-template-columns: 1fr; }
+}
+@media (max-width: 960px) {
+  .chip { height: 34px; }
+}
+
+/* Filtros: a lista nativa cobre o botão inteiro (invisível), então qualquer clique abre */
+.chip-select { position: relative; cursor: pointer; }
+.chip-select select {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer; font-size: 16px;
+}
+.chip-select:focus-within { border-color: #3b7ddd; box-shadow: 0 0 0 3px rgba(59, 125, 221, .15); }
